@@ -15,53 +15,52 @@ def print_board():
    ve3 = f"| {board[2][0]} | {board[2][1]} | {board[2][2]} |\n"
    ho4 = " --- --- ---\n"
    print(ho, ve, ho2, ve2, ho3, ve3, ho4)
-
-
 def playX():
-   X = input("You are X, enter your move: ")
-   if X == "a1" and board[0][0] == 0:
+    X = input("You are X, enter your move: ")
+    if X == "a1" and board[0][0] == 0:
        board[0][0] = 1
-   elif X == "b1" and board[0][1] == 0:
+    elif X == "b1" and board[0][1] == 0:
        board[0][1] = 1
-   elif X == "c1"and board[0][2] == 0:
+    elif X == "c1"and board[0][2] == 0:
        board[0][2] = 1
-   elif X == "a2" and board[1][0] == 0:
+    elif X == "a2" and board[1][0] == 0:
        board[1][0] = 1
-   elif X == "b2" and board[1][1] == 0:
+    elif X == "b2" and board[1][1] == 0:
        board[1][1] = 1
-   elif X == "c2" and board[1][2] == 0:
+    elif X == "c2" and board[1][2] == 0:
        board[1][2] = 1
-   elif X == "a3" and board[2][0] == 0:
+    elif X == "a3" and board[2][0] == 0:
        board[2][0] = 1
-   elif X == "b3" and board[2][1] == 0:
+    elif X == "b3" and board[2][1] == 0:
        board[2][1] = 1
-   elif X == "c3" and board[2][2] == 0:
+    elif X == "c3" and board[2][2] == 0:
        board[2][2] = 1
-
-
+    else:
+        print("Invalid move, try again")
+        playX()
 def playO():
-   X = input("You are O, enter your move: ")
-   if X == "a1" and board[0][0] == 0:
-       board[0][0] = 2
-   elif X == "b1":
-       board[0][1] = 2
-   elif X == "c1":
-       board[0][2] = 2
-   elif X == "a2":
-       board[1][0] = 2
-   elif X == "b2":
-       board[1][1] = 2
-   elif X == "c2":
-       board[1][2] = 2
-   elif X == "a3":
-       board[2][0] = 2
-   elif X == "b3":
-       board[2][1] = 2
-   elif X == "c3":
-       board[2][2] = 2
-   print_board()
-
-
+    O = input("You are O, enter your move: ")
+    if O == "a1" and board[0][0] == 0:
+        board[0][0] = 2
+    elif O == "b1" and board[0][1] == 0:
+        board[0][1] = 2
+    elif O == "c1" and board[0][2] == 0:
+        board[0][2] = 2
+    elif O == "a2" and board[1][0] == 0:
+        board[1][0] = 2
+    elif O == "b2" and board[1][1] == 0:
+        board[1][1] = 2
+    elif O == "c2" and board[1][2] == 0:
+        board[1][2] = 2
+    elif O == "a3" and board[2][0] == 0:
+        board[2][0] = 2
+    elif O == "b3" and board[2][1] == 0:
+        board[2][1] = 2
+    elif O == "c3" and board[2][2] == 0:
+        board[2][2] = 2
+    else:
+        print("Invalid move, try again")
+        playO()
 def win():
    global winX, winO, gaming
    # Win conditions
@@ -122,8 +121,6 @@ def win():
        winO = True
        gaming = False
    return winX, winO, gaming
-
-
 def game():
    playX()
    print_board()
