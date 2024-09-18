@@ -4,7 +4,8 @@ board = [[0, 0, 0],
 winX = False
 winO = False
 gaming = True
-
+print("Welcome to Tic-Tac-Toe\n")
+print("a1 | b1 | c1\n---|----|---\na2 | b2 | c2\n---|----|---\na3 | b3 | c3\n")
 
 def print_board():
    ho = "  --- --- ---\n"
