@@ -16,5 +16,7 @@ verb2 = input("Choose another verb: ")
 adj3 = input("Choose another adjective: ")
 name3 = input("Choose another Store name: ")
 
-mad_lib = f"It was almost {holiday}, so {name} knew they had to get grocery shopping. They {verb} to the {name1} and picked up a {noun}. They looked at their list. They needed to get {adj} {noun1}, {adj1} {noun2}, and {adj2} {noun3}. They couldn't find anything! Eventually they saw their friend, {name2}, and {verb1} them for help. Their friend {verb2}. \"You're in the {adj3} place!\"they said. \"This is a {name3}\""
+mad_lib = f"It was almost {holiday}, so {name} knew they had to get grocery shopping. They {verb} to the {name1} and picked up a {noun}. They looked at their list. They needed to get {adj} {noun1}, {adj1} {noun2}, and {adj2} {noun3}. They couldn't find anything! Eventually they saw their friend, {name2}, and {verb1} them for help. Their friend {verb2}. \"You're in the {adj3} place!\" they said. \"This is a {name3}\"."
 print (mad_lib)
+input("Press enter to exit: ")
+quit()
