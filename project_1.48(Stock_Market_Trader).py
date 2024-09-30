@@ -51,4 +51,6 @@ pps = pps[10:]
 
 # Print the data together in the desired format
 for i in range(min(len(name), len(pps), len(high_low))):
-    print(f"{name[i]}, {pps[i]}, {high_low[i]}")
+    #print(len(name), len(pps), len(high_low))
+
+    print(f"{pps[i]}, {len(pps)}")
