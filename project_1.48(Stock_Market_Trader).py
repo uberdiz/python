@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+import time
+import matplotlib.pyplot as plt
 
 # Request the page
 url = 'https://www.google.com/finance/markets/most-active?hl=en'
@@ -18,6 +20,7 @@ print("Title: ", t)
 # Lists to store extracted data
 name = []
 pps = []
+perc = []
 high_low = []
 
 # Function to print all names
@@ -39,18 +42,45 @@ def print_all_names():
     # Extract high/low range (if available)
     for range_info in soup.find_all('div', class_='JwB6zf'):
         range_text = range_info.text.strip()
-        high_low.append(range_text)
+        perc.append(range_text)
 
-    return name, pps, high_low
+    for hl in soup.find_all("span", {"class":["P2Luy Ebnabc", "P2Luy Ez2Ioe"]}):
+        hl_text = hl.text.strip()
+        high_low.append(hl_text)
+    return name, pps, perc, high_low
+def find_stocks():
+    # Call the function to extract data
+    name, pps, perc, high_low = print_all_names()
 
-# Call the function to extract data
-name, pps, high_low = print_all_names()
+    # Remove the first 10 items from the pps list
+    pps = pps[10:]
+    perc = perc[16:67]
+    high_low = high_low[5:]
 
-# Remove the first 10 items from the pps list
-pps = pps[10:]
-
-# Print the data together in the desired format
-for i in range(min(len(name), len(pps), len(high_low))):
-    #print(len(name), len(pps), len(high_low))
-
-    print(f"{pps[i]}, {len(pps)}")
+    # Print the data together in the desired format
+    f = open("!StockHelper_List.csv", "a")
+    for i in range(min(len(name), len(pps), len(perc), len(high_low))):
+        f.write(f"{name[i]} , {pps[i]}, {perc[i]}, {high_low[i]}\n")
+    f.close()
+times = 0
+y = []
+x = [1,2,3]
+def graph():
+    find_stocks()
+    y.append(high_low[0]) 
+plt.show()
+graph()
+time.sleep(10)
+graph()
+time.sleep(10)
+graph()
+# naming the x axis
+plt.ylabel(name[0])
+# naming the y axis
+plt.xlabel("Time by 10 sec")
+plt.plot(x, y)
+plt.show()
+'''running = True
+while running:
+    find_stocks()
+    time.sleep(10)'''
