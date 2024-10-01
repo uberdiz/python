@@ -5,24 +5,20 @@ import matplotlib.pyplot as plt
 
 # Request the page
 url = 'https://www.google.com/finance/markets/most-active?hl=en'
-r = requests.get(url)
-
-# Extract the HTML content
-r_html = r.text
-
-# Parse the HTML using BeautifulSoup
-soup = BeautifulSoup(r_html, 'html.parser')
-
-# Get the title of the page
-t = soup.title.string
-print("Title: ", t)
-
+def load_page():
+    # Make an HTTP request to fetch the page content
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    return soup
+def reload_page():
+    # Reload the page at the specified interval
+    soup = load_page()
+    print(soup.title.string)  # Example of using the parsed content
 # Lists to store extracted data
 name = []
 pps = []
 perc = []
 high_low = []
-
 # Function to print all names
 def print_all_names():
     # Extract stock names
@@ -49,6 +45,7 @@ def print_all_names():
         high_low.append(hl_text)
     return name, pps, perc, high_low
 def find_stocks():
+    print("Ran find stocks")
     # Call the function to extract data
     name, pps, perc, high_low = print_all_names()
 
@@ -57,45 +54,55 @@ def find_stocks():
     perc = perc[16:67]
     high_low = high_low[5:]
 
-    '''# Print the data together in the desired format
+    # Print the data together in the desired format
     f = open("!StockHelper_List.csv", "w")
     for i in range(min(len(name), len(pps), len(perc), len(high_low))):
         f.write(f"{name[i]} , {pps[i]}, {perc[i]}, {high_low[i]}\n")
-    f.close()'''
+    f.close()
+    print(pps[0])
+    return pps
 times = 0
 y = []
 x = []
-'''find_stocks()
-choice = input("Choose a company to follow: ")
-for x in range(len(name)):
-    if name[x] == choice:
-        print(f"{choice}'s current price is: {pps[x + 10]}")
-        break'''
 def graph():
     find_stocks()
-    y.append(pps[10]) 
+    # Convert the stock price to a float (you may need to remove currency symbols first)
+    price = float(pps[z + 10].replace('$', '').replace(',', ''))  # Ensure price is numerical
+    y.append(price)
 def repeat_graph():
     plt.clf()
     x.append(len(x) + 1)
     graph()
-    # naming the x axis
-    plt.ylabel(name[0])
-    # naming the y axis
+    # Reverse the y-axis values to show a higher-to-lower effect
+    plt.gca()
+
+    # Naming the x-axis
+    plt.ylabel(name[numtotrack - 10])
+
+    # Naming the y-axis
     plt.xlabel("By change in price")
+
     plt.plot(x, y)
     plt.show()
 plt.ion()
-gaming = True
-pp_copy = 1
+soup = load_page()
 find_stocks()
-while gaming:
-    pps[10] = pp_copy  # Set the previous value for comparison
-    time.sleep(0.01)
-    find_stocks()
-        # Get new input, and convert it to a float
-    new_value = pps[10]
-        
-    if pp_copy != new_value:
-        pp_copy = new_value  # Update the `pp_copy` to the new value
-        pps[10] = pp_copy  # Store the new value in pps
-        repeat_graph()  # Call the graphing function to update the plot
+choice = input("Choose a company to follow: ")
+for z in range(len(name)):
+    if name[z] == choice:
+        print(f"{choice}'s current price is: {pps[z + 10]}")
+        numtotrack = z + 10
+        while True:
+            pp_copy = pps[z + 10]  # Set the previous value for comparison
+            print(f"pps: {pps[z + 10]}")
+            print(f"copy: {pp_copy}")
+            time.sleep(0.5)
+            reload_page()
+            find_stocks()
+            new_value = pps[z + 10]
+            print(f"New value: {new_value}")
+                
+            if pp_copy != new_value:
+                pp_copy = new_value  # Update the `pp_copy` to the new value
+                pps[z + 10] = pp_copy  # Store the new value in pps
+                repeat_graph()  # Call the graphing function to update the plot
