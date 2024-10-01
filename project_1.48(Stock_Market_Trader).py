@@ -5,25 +5,33 @@ import matplotlib.pyplot as plt
 
 # Request the page
 url = 'https://www.google.com/finance/markets/most-active?hl=en'
+
 def load_page():
     # Make an HTTP request to fetch the page content
     r = requests.get(url)
     soup = BeautifulSoup(r.text, 'html.parser')
     return soup
+
 def reload_page():
-    # Reload the page at the specified interval
-    soup = load_page()
-    print(soup.title.string)  # Example of using the parsed content
+    # Reload the page to fetch updated stock data
+    return load_page()
+
 # Lists to store extracted data
 name = []
 pps = []
 perc = []
 high_low = []
-# Function to print all names
-def print_all_names():
+
+# Function to print all names and prices
+def print_all_names(soup):
+    global name, pps, perc, high_low
+    name.clear()
+    pps.clear()
+    perc.clear()
+    high_low.clear()
+
     # Extract stock names
     for heading in soup.find_all('div', class_='ZvmM7'):
-        # If the heading has a link, extract text from the link
         if heading.a:
             name_text = heading.a.text.strip()
         else:
@@ -44,65 +52,62 @@ def print_all_names():
         hl_text = hl.text.strip()
         high_low.append(hl_text)
     return name, pps, perc, high_low
-def find_stocks():
-    print("Ran find stocks")
-    # Call the function to extract data
-    name, pps, perc, high_low = print_all_names()
 
-    # Remove the first 10 items from the pps list
+def find_stocks(soup):
+    # Extract and update stock data
+    name, pps, perc, high_low = print_all_names(soup)
+
+    # Remove irrelevant items from the lists
     pps = pps[10:]
     perc = perc[16:67]
     high_low = high_low[5:]
-
-    # Print the data together in the desired format
-    f = open("!StockHelper_List.csv", "w")
-    for i in range(min(len(name), len(pps), len(perc), len(high_low))):
-        f.write(f"{name[i]} , {pps[i]}, {perc[i]}, {high_low[i]}\n")
-    f.close()
-    print(pps[0])
     return pps
-times = 0
+
 y = []
 x = []
+
 def graph():
-    find_stocks()
-    # Convert the stock price to a float (you may need to remove currency symbols first)
-    price = float(pps[z + 10].replace('$', '').replace(',', ''))  # Ensure price is numerical
+    # Convert the stock price to a float
+    price = float(pps[numtotrack].replace('$', '').replace(',', ''))  # Ensure price is numerical
     y.append(price)
+
 def repeat_graph():
-    plt.clf()
-    x.append(len(x) + 1)
-    graph()
-    # Reverse the y-axis values to show a higher-to-lower effect
-    plt.gca()
+    plt.clf()  # Clear the previous plot
+    x.append(len(x) + 1)  # Increment x-axis
+    graph()  # Call the graphing function to add the new stock price
 
-    # Naming the x-axis
+    # Naming the x-axis and y-axis
     plt.ylabel(name[numtotrack - 10])
-
-    # Naming the y-axis
-    plt.xlabel("By change in price")
+    plt.xlabel("Price Change Event")
 
     plt.plot(x, y)
     plt.show()
-plt.ion()
+
+plt.ion()  # Turn on interactive plotting
+
+# Initial load of the page and stock data
 soup = load_page()
-find_stocks()
+find_stocks(soup)
 choice = input("Choose a company to follow: ")
+
+# Find the index of the chosen stock
 for z in range(len(name)):
     if name[z] == choice:
         print(f"{choice}'s current price is: {pps[z + 10]}")
         numtotrack = z + 10
+        # Start monitoring and updating the graph only if the stock price changes
+        pp_copy = pps[numtotrack]  # Set initial stock price to track
         while True:
-            pp_copy = pps[z + 10]  # Set the previous value for comparison
-            print(f"pps: {pps[z + 10]}")
-            print(f"copy: {pp_copy}")
-            time.sleep(0.5)
-            reload_page()
-            find_stocks()
-            new_value = pps[z + 10]
-            print(f"New value: {new_value}")
-                
-            if pp_copy != new_value:
-                pp_copy = new_value  # Update the `pp_copy` to the new value
-                pps[z + 10] = pp_copy  # Store the new value in pps
-                repeat_graph()  # Call the graphing function to update the plot
+            print(f"Current price of {name[numtotrack]}: {pps[numtotrack]}")
+            time.sleep(0.5)  # Wait for 0.5 seconds before reloading the page
+
+            # Reload the page and fetch updated stock data
+            soup = reload_page()
+            find_stocks(soup)
+
+            new_value = pps[numtotrack]  # Get the updated stock price
+            
+            if pp_copy != new_value:  # Detect price change
+                pp_copy = new_value  # Update the previous stock price
+                print(f"Price changed to: {new_value}")
+                repeat_graph()  # Update the graph with new data only on price change
