@@ -57,30 +57,45 @@ def find_stocks():
     perc = perc[16:67]
     high_low = high_low[5:]
 
-    # Print the data together in the desired format
-    f = open("!StockHelper_List.csv", "a")
+    '''# Print the data together in the desired format
+    f = open("!StockHelper_List.csv", "w")
     for i in range(min(len(name), len(pps), len(perc), len(high_low))):
         f.write(f"{name[i]} , {pps[i]}, {perc[i]}, {high_low[i]}\n")
-    f.close()
+    f.close()'''
 times = 0
 y = []
-x = [1,2,3]
+x = []
+'''find_stocks()
+choice = input("Choose a company to follow: ")
+for x in range(len(name)):
+    if name[x] == choice:
+        print(f"{choice}'s current price is: {pps[x + 10]}")
+        break'''
 def graph():
     find_stocks()
-    y.append(high_low[0]) 
-plt.show()
-graph()
-time.sleep(10)
-graph()
-time.sleep(10)
-graph()
-# naming the x axis
-plt.ylabel(name[0])
-# naming the y axis
-plt.xlabel("Time by 10 sec")
-plt.plot(x, y)
-plt.show()
-'''running = True
-while running:
+    y.append(pps[10]) 
+def repeat_graph():
+    plt.clf()
+    x.append(len(x) + 1)
+    graph()
+    # naming the x axis
+    plt.ylabel(name[0])
+    # naming the y axis
+    plt.xlabel("By change in price")
+    plt.plot(x, y)
+    plt.show()
+plt.ion()
+gaming = True
+pp_copy = 1
+find_stocks()
+while gaming:
+    pps[10] = pp_copy  # Set the previous value for comparison
+    time.sleep(0.01)
     find_stocks()
-    time.sleep(10)'''
+        # Get new input, and convert it to a float
+    new_value = pps[10]
+        
+    if pp_copy != new_value:
+        pp_copy = new_value  # Update the `pp_copy` to the new value
+        pps[10] = pp_copy  # Store the new value in pps
+        repeat_graph()  # Call the graphing function to update the plot
