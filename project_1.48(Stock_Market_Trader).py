@@ -66,16 +66,10 @@ def find_stocks(soup):
 y = []
 x = []
 
-def graph():
-    # Convert the stock price to a float
-    price = float(pps[numtotrack].replace('$', '').replace(',', ''))  # Ensure price is numerical
-    y.append(price)
-
 def repeat_graph():
     plt.clf()  # Clear the previous plot
     x.append(len(x) + 1)  # Increment x-axis
-    graph()  # Call the graphing function to add the new stock price
-
+    y.append(float(pps[numtotrack].replace('$', '').replace(',', ''))) # Add the new stock price
     # Naming the x-axis and y-axis
     plt.ylabel(name[numtotrack - 10])
     plt.xlabel("Price Change Event")
@@ -98,13 +92,12 @@ for z in range(len(name)):
         # Start monitoring and updating the graph only if the stock price changes
         pp_copy = pps[numtotrack]  # Set initial stock price to track
         while True:
-            print(f"Current price of {name[numtotrack]}: {pps[numtotrack]}")
+            print(f"Current price of {name[numtotrack - 10]}: {pps[numtotrack]}")
             time.sleep(0.5)  # Wait for 0.5 seconds before reloading the page
 
             # Reload the page and fetch updated stock data
             soup = reload_page()
             find_stocks(soup)
-
             new_value = pps[numtotrack]  # Get the updated stock price
             
             if pp_copy != new_value:  # Detect price change
