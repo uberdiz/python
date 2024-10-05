@@ -4,7 +4,8 @@ import time
 import matplotlib.pyplot as plt
 
 # Request the page
-url = 'https://www.google.com/finance/markets/most-active?hl=en'
+#url = 'https://www.google.com/finance/markets/most-active?hl=en'
+url = 'https://www.google.com/finance/markets/indexes/americas'
 
 def load_page():
     # Make an HTTP request to fetch the page content
