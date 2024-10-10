@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import SMTv2 as sm
 
 # Load data from CSV (replace with actual file path if reading from a file)
 df = pd.read_csv("!StockHelper_List.csv")
@@ -9,12 +10,19 @@ complete_data_stocks = []
 incomplete_data_stocks = []
 swing_stocks = []
 dividend_stocks = []
-
+reload_stocks = []
+interested = ['Market Cap', 'Price/Sales', 'Price/Book', 'Return on Equity  (ttm)', 'Revenue  (ttm)', 'Quarterly Earnings Growth  (yoy)', 'Operating Cash Flow  (ttm)', 'Total Cash  (mrq)', 'Total Debt/Equity  (mrq)', 'Current Ratio  (mrq)', '52 Week Range 3', 'Avg Vol (3 month) 3', 'Avg Vol (10 day) 3', '% Held by Insiders 1', 'Diluted EPS  (ttm)', 'Levered Free Cash Flow  (ttm)', 'Forward Annual Dividend Yield 4', 'Trailing Annual Dividend Yield 3', '5 Year Average Dividend Yield 4', 'Price', 'Beta (5Y Monthly)']
 def load_existing_stocks():
+    reload_stocks = []
+    reload_stocks = pd.read_csv("stocks_to_buy.csv", usecols=['Stock'])
+    reload_stocks = reload_stocks['Stock'].tolist()
+    print(reload_stocks)
+    sm.main(reload_stocks, interested)
+
     if os.path.exists("stocks_to_buy.csv"):
         return pd.read_csv("stocks_to_buy.csv", header=None, names=['Type', 'Stock', 'Price', 'Shares', 'Total_Invested'])
     return pd.DataFrame(columns=['Type', 'Stock', 'Price', 'Shares', 'Total_Invested'])
-
+load_existing_stocks()
 # Function to check if a row has missing or invalid data
 def has_missing_data(row):
     return any(value in ['--', 'Not Found', ''] for value in row)
@@ -64,6 +72,7 @@ def score_dividend_stock(row):
         for metric, weight in weights.items():
             value = row[metric]
             if isinstance(value, str):
+                #FIXME qweeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
                 value = value.strip('%').replace('M', '').replace('B', '').replace('-', '')
                 value = float(value) if value else 0.0  # Convert to float or set to 0 if empty
             score += value * weight
@@ -155,7 +164,6 @@ def calculate_stocks(money, total_spent, swing_stocks, dividend_stocks, total_sw
                     top_n = 3
                     if money <= 500:
                         top_n = 1
-            
             if swing_stocks:
                 # Process swing trading stocks
                 print(f"Buying Swing Trading Stocks with ${swing_money:.2f}\n")
