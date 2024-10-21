@@ -9,10 +9,15 @@ write = "Battle of Trenton (December 26, 1776): Enter 1. The Battle of Trenton c
 words = write.split()
 time.sleep(10)
 for word in words:
+    if random.randint(0, 100) == 1: # 1% chance
+        time.sleep(10)
+    if random.randint(0, 1000) == 1: # .1% chance
+        time.sleep(30)
     # Press the 'Enter' key when the word is exactly "Enter"
     if word == "Enter":
         keyboard.press_and_release('enter')
     else:
+            
         # Type the word character by character
         for i in word:
             # Add random pauses to simulate natural typing speed
