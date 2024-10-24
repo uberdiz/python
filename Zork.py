@@ -10,13 +10,41 @@ print("Small hits have small damage potential but are more reliable ex.(5-7)")
 time.sleep(1.5)
 print("Good luck!")
 time.sleep(.8)
-# 3 Floors with 4 Rooms each
 # 5 Floors with 6 Rooms each
-f1 = [['UpStairs'], ['Sword', 'Fire Sword', 'Cursed Sword', 'Big Sword', 'Dex Charm', 'Cursed Armor', 'Healing Potion', 'Stamina Potion', 'Ice Shield', 'Thunder Hammer', 'Armor', 'Dex Charm'], ['Monster'], ['Stamina Potion'], ['Monster'], ['Cursed Sword']]
-f2 = [['UpStairs'], ['DownStairs', 'Magic Stones'], ['Dex Charm', 'Shield'], ['Monster'], ['Potion'], ['Monster', 'Cursed Armor']]
-f3 = [['Monster'], ['DownStairs'], ['Boss', 'Sword'], ['None'], ['Armor', 'Magic Stones'], ['Big Sword', 'Potion']]
-f4 = [['UpStairs'], ['DownStairs', 'Magic Charm'], ['Monster', 'Sword'], ['Potion'], ['Dex Charm', 'Monster'], ['Armor']]
-f5 = [['Magic Stones'], ['UpStairs'], ['Monster', 'Big Sword'], ['PRIZE', 'Boss'], ['Monster'], ['Dex Charm']]
+f1 = [['UpStairs'], 
+      ['Sword', 'Healing Potion', 'Armor'], 
+      ['Monster'], 
+      ['Stamina Potion'], 
+      ['Ice Monster'], 
+      ['Dex Charm', 'Cursed Sword']] 
+
+f2 = [['UpStairs'], 
+      ['DownStairs', 'Magic Stones'], 
+      ['Ice Shield', 'Potion'], 
+      ['Monster', 'Cursed Armor'], 
+      ['Monster'], 
+      ['Dex Charm']] 
+
+f3 = [['DownStairs'], 
+      ['Poison Monster'], 
+      ['Armor', 'Magic Stones'], 
+      ['UpStairs'],  
+      ['Monster'], 
+      ['Big Sword']] 
+
+f4 = [['UpStairs'], 
+      ['DownStairs', 'Magic Charm'], 
+      ['Monster', 'Sword'], 
+      ['Potion', 'Armor'], 
+      ['Dex Charm', 'Monster'], 
+      ['Healing Potion']] 
+f5 = [['Magic Stones'], 
+      ['DownStairs'], 
+      ['Monster', 'Big Sword'], 
+      ['Boss'],  # The Boss Room
+      ['PRIZE'],  # PRIZE is one room over from the Boss
+      ['Monster']]
+
 
 # Player is spawned into a random room on the first floor
 spawn  = random.randint(0, len(f1) - 1)
@@ -25,87 +53,71 @@ spawn_floor = 1
 dun_floor = f1
 # Use a list to keep track of the user's items. At the beginning of the game it should be empty. A maximum of two items can be held.
 inventory = []
-def player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory):
+def player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina):
+    Crit = False
     time.sleep(.8)
-    stamina = 0
-    if "Dex Charm" in inventory:
-        stamina = 15
     if "Big Sword" in inventory:
-        sword_rangeB -= 5
-    stamina += 10
+        stamina -= 3
     print(f"Boss health = {Boss_health}, Your health = {player_health}, Your Stamina = {stamina}\n")
+    
+    # Fire Sword bonus damage
     if "Fire Sword" in inventory:
         over = random.randint(1, 10)
         Boss_health -= over
         print(f"Your Fire Sword did {over} damage")
         time.sleep(.8)
-    num1 = random.randint(20, 100)
-    num2 = random.randint(20, 100)
-    num1 = num1 + num2
+
+    # Math challenge for attack
+    num1 = random.randint(20, 50)
+    num2 = random.randint(20, 50)
     play = int(input(f"What is {num1} + {num2}? "))
+    
+    # Ensure correct math input from player
     if play == num1 + num2:  
         play = input("Big hit or Small hit or Heal (B or S or H): ").capitalize()
-        while play != "B" and play != "S" and play != "H":
+        while play not in ["B", "S", "H"]:
             print("Invalid")
             play = input("Big hit or Small hit or Heal (B or S or H): ").capitalize()
-        num1 = random.randint(1, 10)
+
+        # Healing logic
         if play == "H":
             print(inventory)
             choice = input("Which item would you like to use? ")
-            if choice == "Healing Potion":
-                if "Healing Potion" in inventory:
-                    player_health += 10
-                    inventory.remove("Healing Potion")
-                else:
-                    time.sleep(.8)
-                    print("You don't have any Healing Potions")
-            elif choice == "Stamina Potion":
-                if "Stamina Potion" in inventory:
-                    stamina += 10
-                    inventory.remove("Stamina Potion")
-                else:
-                    time.sleep(.8)
-                    print("You don't have any Stamina Potions")
+            if choice == "Healing Potion" and "Healing Potion" in inventory:
+                player_health += 10
+                inventory.remove("Healing Potion")
+            elif choice == "Stamina Potion" and "Stamina Potion" in inventory:
+                stamina += 10
+                inventory.remove("Stamina Potion")
             else:
-                time.sleep(.8)
-                print("Invalid")
-                play = input("Big hit or Small hit (B or S): ").capitalize()
-                while play != "B" and play != "S":
-                    print("Invalid")
-                    play = input("Big hit or Small hit (B or S): ").capitalize()
-        if num1 == 1:
-            time.sleep(.4)
+                print("You don't have that potion.")
+            return Boss_health, stamina
+
+        # Critical hit logic
+        if random.randint(1, 5) == 1:
             print("Critical Hit!")
             Crit = True
-        if play == "B":
-            hit = sword_rangeB
-            samina -= 3
-        elif play == "S":
-            hit = sword_rangeS
-            stamina -= 1
-        if stamina <= 0:
-            stamina = 0
-            time.sleep(.4)
-            print("Your stamina is empty!")
-            time.sleep(.4)
-            print("You have died!")
-            gaming = False
-            return gaming
+
+        # Attack logic
+        hit = sword_rangeB if play == "B" else sword_rangeS
+        stamina -= 3 if play == "B" else 1
         if Crit:
             hit = hit * 2
-        else:
-            hit = hit
-        time.sleep(.8)
+        
         print(f"You hit for {hit} damage!")
         Boss_health -= hit
-
-        return Boss_health
+    else:
+        print("You missed!")
+        return Boss_health, stamina
+    return Boss_health, stamina
+# Modify BossBat function as well
 def BossBat(inventory, gaming):
     sword_rangeB = random.randint(2, 15)
     sword_rangeS = random.randint(5, 7)
-    Boss_health = 100
+    Boss_health = 200
     player_health = 100
-    if "Sword" or "Cursed Sword" or "Big Sword" in inventory and "Magic Stones" in inventory:
+    
+    if "Sword" in inventory or "Cursed Sword" in inventory or "Big Sword" in inventory or "Thunder Hammer" in inventory or "Fire Sword" in inventory and "Magic Stones" in inventory:
         if "Big Sword" in inventory:
             print("Added 5 damage for Big Sword")
             sword_rangeB += 5
@@ -113,97 +125,122 @@ def BossBat(inventory, gaming):
         if "Cursed Armor" in inventory:
             print("Added 50 health for Cursed Armor, Damage is reduced by 30%")
             player_health += 50
-            sword_rangeB -= sword_rangeB * .3
-            sword_rangeS -= sword_rangeS * .3
+            sword_rangeB *= 0.7  # Reduce damage by 30%
+            sword_rangeS *= 0.7
         if "Cursed Sword" in inventory:
-            print("Added 15 damage for Cursed Sword, Helth is reduced by 40%")
+            print("Added 15 damage for Cursed Sword, Health is reduced by 40%")
             sword_rangeB += 15
             sword_rangeS += 15
-            player_health -= player_health * .4
-        if "Armor" in inventory:
-            print("Added 25 health for Armor")
-            player_health += 25
+            player_health *= 0.6  # Reduce health by 40%
         if "Fire Sword" in inventory:
             print("Added 7 damage for Fire Sword")
             sword_rangeB += 7
             sword_rangeS += 7
+        if "Thunder Hammer" in inventory:
+            print("Added 5 damage for Thunder Hammer")
+            sword_rangeB += 5
+            sword_rangeS += 5
+        if "Ice Shield" in inventory:
+            print("Added 10 health for Ice Shield")
+            player_health += 10
+        if "Armor" in inventory:
+            print("Added 5 health for Armor")
+            player_health += 5
+        stamina = 15 if "Dex Charm" in inventory else 10
+        
         while Boss_health > 0 and player_health > 0:
-            Boss_health, gaming = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
-            if gaming == False:
-                return gaming
+            Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+            if not gaming:
+                return False
+            
+            # Handle effects like Dex Charm
             if "Dex Charm" in inventory:
-                print("You are too fast because of the Dex Charm, Get ready to hit harder")
-                Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
             if "Ice Shield" in inventory and "Dex Charm" not in inventory:
-                print("You stun the enemy because of the Ice Shield, Get ready to hit harder")
-                Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
             if "Thunder Hammer" in inventory and "Dex Charm" not in inventory and "Ice Shield" not in inventory:
-                print("You are too fast because of the Thunder Hammer, Get ready to hit harder")
-                Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
-            hit = random.randint(1,20)
-            time.sleep(.4)
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+            # Monster retaliation
+            hit = random.randint(1, 20)
             print(f"The Boss hit you for {hit} damage!")
             player_health -= hit
+
+        if player_health <= 0:
+            print("You lost!")
+            return False
+        if Boss_health <= 0:
+            print("The Boss is defeated!")
+            return True
     else:
-        print("You do not have the Magic Stones or a sword to defeat the Boss")
-        gaming = False
-        return gaming
-    if player_health <= 0:
-        time.sleep(.4)
-        print("You lost!")
-        gaming = False
-        return gaming
-    if Boss_health <= 0:
-        time.sleep(.4)
-        print("He died!")
-        gaming = True
-        return gaming
+        print("You don't have the necessary items to fight the Boss.")
+        return False
 def MonsterBat(inventory, gaming):
-    print("Monster Bat")
-    sword_rangeB = random.randint(2, 15)
-    sword_rangeS = random.randint(5, 7)
-    Boss_health = 50
-    player_health = 100
-    if "Big Sword" in inventory:
+        stamina = 10
+        sword_rangeB = random.randint(2, 15)
+        sword_rangeS = random.randint(5, 7)
+        Boss_health = 50
+        player_health = 100
+        if "Big Sword" in inventory:
             print("Added 5 damage for Big Sword")
             sword_rangeB += 5
             sword_rangeS += 5
-    if "Cursed Armor" in inventory:
+        if "Cursed Armor" in inventory:
             print("Added 50 health for Cursed Armor, Damage is reduced by 30%")
             player_health += 50
-            sword_rangeB -= sword_rangeB * .3
-            sword_rangeS -= sword_rangeS * .3
-    if "Cursed Sword" in inventory:
-            print("Added 15 damage for Cursed Sword, Helth is reduced by 40%")
+            sword_rangeB *= 0.7  # Reduce damage by 30%
+            sword_rangeS *= 0.7
+        if "Cursed Sword" in inventory:
+            print("Added 15 damage for Cursed Sword, Health is reduced by 40%")
             sword_rangeB += 15
             sword_rangeS += 15
-            player_health -= player_health * .4
-    if "Armor" in inventory:
-            print("Added 25 health for Armor")
-            player_health += 25
-    if "Fire Sword" in inventory:
+            player_health *= 0.6  # Reduce health by 40%
+        if "Fire Sword" in inventory:
             print("Added 7 damage for Fire Sword")
             sword_rangeB += 7
             sword_rangeS += 7
-    while Boss_health > 0 and player_health > 0:
-        Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
-        if "Dex Charm" in inventory:
-            Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
-        hit = random.randint(1,20)
-        time.sleep(.4)
-        print(f"The Monster hit you for {hit} damage!")
-        player_health -= hit
-    if player_health <= 0:
-        time.sleep(.4)
-        print("You lost!")
-        gaming = False
-        return gaming
-    if Boss_health <= 0:
-        time.sleep(.4)
-        print("He died!")
-        gaming = True
-        return gaming
+        if "Thunder Hammer" in inventory:
+            print("Added 5 damage for Thunder Hammer")
+            sword_rangeB += 5
+            sword_rangeS += 5
+        if "Ice Shield" in inventory:
+            print("Added 10 health for Ice Shield")
+            player_health += 10
+        if "Armor" in inventory:
+            print("Added 5 health for Armor")
+            player_health += 5
+        stamina = 15 if "Dex Charm" in inventory else 10
+        
+        while Boss_health > 0 and player_health > 0:
+            Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+            if not gaming:
+                return False
+            
+            # Handle effects like Dex Charm
+            if "Dex Charm" in inventory:
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+            if "Ice Shield" in inventory and "Dex Charm" not in inventory:
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+            if "Thunder Hammer" in inventory and "Dex Charm" not in inventory and "Ice Shield" not in inventory:
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+            # Monster retaliation
+            hit = random.randint(1, 20)
+            print(f"The Boss hit you for {hit} damage!")
+            player_health -= hit
+
+        if player_health <= 0:
+            print("You lost!")
+            return False
+        if Boss_health <= 0:
+            print("The Monster is defeated!")
+            return True
 def PoisonBat(inventory, gaming):
+    stamina = 10
     sword_rangeB = random.randint(2, 15)
     sword_rangeS = random.randint(5, 7)
     Boss_health = 60
@@ -215,55 +252,59 @@ def PoisonBat(inventory, gaming):
     if "Cursed Armor" in inventory:
             print("Added 50 health for Cursed Armor, Damage is reduced by 30%")
             player_health += 50
-            sword_rangeB -= sword_rangeB * .3
-            sword_rangeS -= sword_rangeS * .3
+            sword_rangeB *= 0.7  # Reduce damage by 30%
+            sword_rangeS *= 0.7
     if "Cursed Sword" in inventory:
-            print("Added 15 damage for Cursed Sword, Helth is reduced by 40%")
+            print("Added 15 damage for Cursed Sword, Health is reduced by 40%")
             sword_rangeB += 15
             sword_rangeS += 15
-            player_health -= player_health * .4
-    if "Armor" in inventory:
-            print("Added 25 health for Armor")
-            player_health += 25
+            player_health *= 0.6  # Reduce health by 40%
     if "Fire Sword" in inventory:
             print("Added 7 damage for Fire Sword")
             sword_rangeB += 7
             sword_rangeS += 7
+    if "Thunder Hammer" in inventory:
+            print("Added 5 damage for Thunder Hammer")
+            sword_rangeB += 5
+            sword_rangeS += 5
+    if "Ice Shield" in inventory:
+            print("Added 10 health for Ice Shield")
+            player_health += 10
+    if "Armor" in inventory:
+            print("Added 5 health for Armor")
+            player_health += 5
+    stamina = 15 if "Dex Charm" in inventory else 10
+        
     while Boss_health > 0 and player_health > 0:
-        Boss_health, gaming = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
-        if gaming == False:
-            return gaming
+        Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+        if not gaming:
+            return False
+            
+        # Handle effects like Dex Charm
         if "Dex Charm" in inventory:
-            print("You are too fast because of the Dex Charm, Get ready to hit harder")
-            Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
         if "Ice Shield" in inventory and "Dex Charm" not in inventory:
-            print("You stun the enemy because of the Ice Shield, Get ready to hit harder")
-            Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
         if "Thunder Hammer" in inventory and "Dex Charm" not in inventory and "Ice Shield" not in inventory:
-            print("You are too fast because of the Thunder Hammer, Get ready to hit harder")
-            Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
-        hit = random.randint(1,20)
-        print(f"The Monster hit you for {hit} damage!")
-        time.sleep(.4)
-        poi = random.randint(1, 10)
-        hit += poi
-        print(f"Poisoned for {poi} damage!")
-        time.sleep(.4)
-        print(f"The Monster hit you for {hit} damage!")
+                print("You are too fast because of the Dex Charm, get ready to hit harder")
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+        # Monster retaliation
+        hit = random.randint(1, 20)
+        print(f"The Boss hit you for {hit} damage!")
         player_health -= hit
+
     if player_health <= 0:
-        time.sleep(.4)
-        print("You lost!")
-        gaming = False
-        return gaming
+            print("You lost!")
+            return False
     if Boss_health <= 0:
-        time.sleep(.4)
-        print("He died!")
-        gaming = True
-        return gaming
+            print("The Poison Monster is defeated!")
+            return True
 def IceBat(inventory, gaming):
+    stamina = 10
     skipper = random.randint(1, 10)
-    if skipper % 2 == 0:
+    if skipper % 4 == 0:
          skipper = True
     else:
          skipper = False
@@ -271,62 +312,68 @@ def IceBat(inventory, gaming):
     sword_rangeS = random.randint(5, 7)
     Boss_health = 50
     player_health = 100
-    if "Big Sword" in inventory:
-            print("Added 5 damage for Big Sword")
-            sword_rangeB += 5
-            sword_rangeS += 5
-    if "Cursed Armor" in inventory:
-            print("Added 50 health for Cursed Armor, Damage is reduced by 30%")
-            player_health += 50
-            sword_rangeB -= sword_rangeB * .3
-            sword_rangeS -= sword_rangeS * .3
-    if "Cursed Sword" in inventory:
-            print("Added 15 damage for Cursed Sword, Helth is reduced by 40%")
-            sword_rangeB += 15
-            sword_rangeS += 15
-            player_health -= player_health * .4
-    if "Armor" in inventory:
-            print("Added 25 health for Armor")
-            player_health += 25
-    if "Fire Sword" in inventory:
-            print("Added 7 damage for Fire Sword")
-            sword_rangeB += 7
-            sword_rangeS += 7
-    while Boss_health > 0 and player_health > 0:
-            if skipper == False:
-                Boss_health, gaming = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
-                if gaming == False:
-                    return gaming
+    if skipper == False:
+        if "Big Sword" in inventory:
+                print("Added 5 damage for Big Sword")
+                sword_rangeB += 5
+                sword_rangeS += 5
+        if "Cursed Armor" in inventory:
+                print("Added 50 health for Cursed Armor, Damage is reduced by 30%")
+                player_health += 50
+                sword_rangeB *= 0.7  # Reduce damage by 30%
+                sword_rangeS *= 0.7
+        if "Cursed Sword" in inventory:
+                print("Added 15 damage for Cursed Sword, Health is reduced by 40%")
+                sword_rangeB += 15
+                sword_rangeS += 15
+                player_health *= 0.6  # Reduce health by 40%
+        if "Fire Sword" in inventory:
+                print("Added 7 damage for Fire Sword")
+                sword_rangeB += 7
+                sword_rangeS += 7
+        if "Thunder Hammer" in inventory:
+                print("Added 5 damage for Thunder Hammer")
+                sword_rangeB += 5
+                sword_rangeS += 5
+        if "Ice Shield" in inventory:
+                print("Added 10 health for Ice Shield")
+                player_health += 10
+        if "Armor" in inventory:
+                print("Added 5 health for Armor")
+                player_health += 5
+        stamina = 15 if "Dex Charm" in inventory else 10
+            
+        while Boss_health > 0 and player_health > 0:
+                Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+                if not gaming:
+                    return False
+                
+                # Handle effects like Dex Charm
                 if "Dex Charm" in inventory:
-                    print("You are too fast because of the Dex Charm, Get ready to hit harder")
-                    Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
+                    print("You are too fast because of the Dex Charm, get ready to hit harder")
+                    Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
                 if "Ice Shield" in inventory and "Dex Charm" not in inventory:
-                    print("You stun the enemy because of the Ice Shield, Get ready to hit harder")
-                    Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
+                    print("You are too fast because of the Dex Charm, get ready to hit harder")
+                    Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
                 if "Thunder Hammer" in inventory and "Dex Charm" not in inventory and "Ice Shield" not in inventory:
-                    print("You are too fast because of the Thunder Hammer, Get ready to hit harder")
-                    Boss_health = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory)
-                hit = random.randint(1,20)
-                time.sleep(.4)
+                    print("You are too fast because of the Dex Charm, get ready to hit harder")
+                    Boss_health, stamina = player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, inventory, stamina)
+                # Monster retaliation
+                hit = random.randint(1, 20)
                 print(f"The Boss hit you for {hit} damage!")
                 player_health -= hit
-            if skipper == True:
-                time.sleep(.4)
-                print("You are frozen, you can't hit the monster!")
-                hit = random.randint(1,20)
-                time.sleep(.4)
-                print(f"The Boss hit you for {hit} damage!")
-                player_health -= hit
+    if skipper:
+        print("The Ice Monster froze you!")
+        # Monster retaliation
+        hit = random.randint(1, 20)
+        print(f"The Boss hit you for {hit} damage!")
+        player_health -= hit
     if player_health <= 0:
-        time.sleep(.4)
-        print("You lost!")
-        gaming = False
-        return gaming
+            print("You lost!")
+            return False
     if Boss_health <= 0:
-        time.sleep(.4)
-        print("He died!")
-        gaming = True
-        return gaming
+            print("The Ice Monster is defeated!")
+            return True
 def Turn(dun_floor, spawn, spawn_floor, inventory):
     gaming = True
     # Prints the contents of the room
@@ -414,7 +461,7 @@ def Turn(dun_floor, spawn, spawn_floor, inventory):
     choice = input("What do you do? ").capitalize()
     while choice not in Options:
         print("Invalid")
-        choice = input("What do you do? ").capitalize()
+        choice = input("What do you do? ")
     if choice != "Fight" and "Monster" in dun_floor[spawn]:
         gaming = False
     if choice == "Right":
@@ -439,33 +486,38 @@ def Turn(dun_floor, spawn, spawn_floor, inventory):
             dun_floor = f3
     if choice == "Grab":
             print(grabs)
-            grabbed = input("What do you grab? ")
+            for i in grabs:
+                grabs[i].capitalize()
+            grabbed = input("What do you grab? ").capitalize()
             while grabbed not in grabs:
                 print("Invalid")
-                grabbed = input("What do you grab? ")
+                grabbed = input("What do you grab? ").capitalize
             inventory.append(grabbed)
             dun_floor[spawn].remove(grabbed)
     if choice == "Drop":
         print(inventory)
-        dropped = input("What do you drop? ")
+        dropped = input("What do you drop? ").capitalize()
         while dropped not in inventory:
             print("Invalid")
             dropped = input("What do you drop? ")
         inventory.remove(dropped)
         dun_floor[spawn].append(dropped)
     if choice == "Fight":
-        if "Sword" in inventory or "Big Sword" in inventory or "Cursed Sword" in inventory or "Fire Sword" in inventory:
+        if "Sword" in inventory or "Big Sword" in inventory or "Cursed Sword" in inventory or "Fire Sword" in inventory or "Thunder Hammer" in inventory:
             print(dun_floor[spawn])
-            if dun_floor[spawn] == ["Monster"]:
-                gaming = MonsterBat(inventory, gaming)
-            if dun_floor[spawn] == ["Poison Monster"]:
+            if "Monster" in dun_floor[spawn]:
                 gaming = PoisonBat(inventory, gaming)
-            if dun_floor[spawn] == ["Ice Monster"]:
-                gaming = IceBat(inventory, gaming)
+                mon = "Monster"
+            if "Poison Monster" in dun_floor[spawn]:
+                gaming = PoisonBat(inventory, gaming)
+                mon = "Poison Monster"
+            if "Ice Monster" in dun_floor[spawn]:
+                gaming = PoisonBat(inventory, gaming)
+                mon = "Ice Monster"
             if gaming == False:
                 return dun_floor, spawn, spawn_floor, inventory, gaming
             else:
-                dun_floor[spawn].remove("Monster")
+                dun_floor[spawn].remove(mon)
         else:
             gaming = False
     if choice == "Boss Fight":
