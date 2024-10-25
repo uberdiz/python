@@ -110,7 +110,6 @@ def player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, i
         print("You missed!")
         return Boss_health, stamina
     return Boss_health, stamina
-# Modify BossBat function as well
 def BossBat(inventory, gaming):
     sword_rangeB = random.randint(2, 15)
     sword_rangeS = random.randint(5, 7)
@@ -476,6 +475,10 @@ def Turn(dun_floor, spawn, spawn_floor, inventory):
             dun_floor = f2
         if spawn_floor == 3:
             dun_floor = f3
+        if spawn_floor == 4:
+            dun_floor = f4
+        if spawn_floor == 5:
+            dun_floor = f5
     if choice == "Down":
         spawn_floor -= 1
         if spawn_floor == 1:
@@ -484,6 +487,10 @@ def Turn(dun_floor, spawn, spawn_floor, inventory):
             dun_floor = f2
         if spawn_floor == 3:
             dun_floor = f3
+        if spawn_floor == 4:
+            dun_floor = f4
+        if spawn_floor == 5:
+            dun_floor = f5
     if choice == "Grab":
             print(grabs)
             for i in grabs:
