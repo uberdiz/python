@@ -20,7 +20,7 @@ f1 = [['UpStairs'],
 
 f2 = [['UpStairs'], 
       ['DownStairs', 'Magic Stones'], 
-      ['Ice Shield', 'Potion'], 
+      ['Ice Shield', 'Stamina Potion'], 
       ['Monster', 'Cursed Armor'], 
       ['Monster'], 
       ['Dex Charm']] 
@@ -35,7 +35,7 @@ f3 = [['DownStairs'],
 f4 = [['UpStairs'], 
       ['DownStairs', 'Magic Charm'], 
       ['Monster', 'Sword'], 
-      ['Potion', 'Armor'], 
+      ['Healing Potion', 'Armor'], 
       ['Dex Charm', 'Monster'], 
       ['Healing Potion']] 
 f5 = [['Magic Stones'], 
@@ -48,7 +48,7 @@ f5 = [['Magic Stones'],
 
 # Player is spawned into a random room on the first floor
 spawn  = random.randint(0, len(f1) - 1)
-spawn = 0
+spawn = 1
 spawn_floor = 1
 dun_floor = f1
 # Use a list to keep track of the user's items. At the beginning of the game it should be empty. A maximum of two items can be held.
@@ -74,18 +74,18 @@ def player_hit(sword_rangeB, sword_rangeS, Boss_health, player_health, gaming, i
     
     # Ensure correct math input from player
     if play == num1 + num2:  
-        play = input("Big hit or Small hit or Heal (B or S or H): ").capitalize()
+        play = input("Big hit or Small hit or Heal (B or S or H): ").lower()
         while play not in ["B", "S", "H"]:
             print("Invalid")
-            play = input("Big hit or Small hit or Heal (B or S or H): ").capitalize()
+            play = input("Big hit or Small hit or Heal (B or S or H): ").lower()
 
         # Healing logic
         if play == "H":
             print(inventory)
             choice = input("Which item would you like to use? ")
-            if choice == "Healing Potion" and "Healing Potion" in inventory:
+            if choice == "HealingPotion" and "HealingPotion" in inventory:
                 player_health += 10
-                inventory.remove("Healing Potion")
+                inventory.remove("HealingPotion")
             elif choice == "Stamina Potion" and "Stamina Potion" in inventory:
                 stamina += 10
                 inventory.remove("Stamina Potion")
@@ -455,19 +455,21 @@ def Turn(dun_floor, spawn, spawn_floor, inventory):
 
     time.sleep(.4)    
     print(f"Options: {Options}\n")
+    for i in range(0, len(Options)):
+        Options[i] = Options[i].lower()
     time.sleep(.4)
     # Player chooses an option
-    choice = input("What do you do? ").capitalize()
+    choice = input("What do you do? ").lower()
     while choice not in Options:
         print("Invalid")
         choice = input("What do you do? ")
-    if choice != "Fight" and "Monster" in dun_floor[spawn]:
+    if choice != "fight" and "monster" in dun_floor[spawn] or "poison monster" in dun_floor[spawn] or "ice monster" in dun_floor[spawn] or "boss" in dun_floor[spawn]:
         gaming = False
-    if choice == "Right":
+    if choice == "right":
         spawn += 1
-    if choice == "Left":
+    if choice == "left":
         spawn -= 1
-    if choice == "Up":
+    if choice == "up":
         spawn_floor += 1
         if spawn_floor == 1:
             dun_floor = f1
@@ -479,7 +481,7 @@ def Turn(dun_floor, spawn, spawn_floor, inventory):
             dun_floor = f4
         if spawn_floor == 5:
             dun_floor = f5
-    if choice == "Down":
+    if choice == "down":
         spawn_floor -= 1
         if spawn_floor == 1:
             dun_floor = f1
@@ -491,25 +493,57 @@ def Turn(dun_floor, spawn, spawn_floor, inventory):
             dun_floor = f4
         if spawn_floor == 5:
             dun_floor = f5
-    if choice == "Grab":
+    if choice == "grab":
+        if len(inventory) < 4:
             print(grabs)
-            for i in grabs:
-                grabs[i].capitalize()
-            grabbed = input("What do you grab? ").capitalize()
-            while grabbed not in grabs:
+            grabs = [item.lower() for item in grabs]   
+            grabbed = input("What do you grab (All for every item)? ").lower()       
+            while grabbed not in grabs and grabbed != "all":
                 print("Invalid")
-                grabbed = input("What do you grab? ").capitalize
-            inventory.append(grabbed)
-            dun_floor[spawn].remove(grabbed)
-    if choice == "Drop":
+                grabbed = input("What do you grab (All for every item)? ").lower()    
+            if grabbed != "all":   
+                grabbed = grabbed.split()    
+                if len(grabbed) > 1:
+                    var = [word.capitalize() for word in grabbed]  
+                    grabbed = " ".join(var)
+                else:
+                    grabbed = grabbed[0].capitalize() 
+                inventory.append(grabbed) 
+                dun_floor[spawn].remove(grabbed)
+                grabs = [item.capitalize() for item in grabs]
+            else:  # All
+                dun_floor[spawn] = [item.lower() for item in dun_floor[spawn]] 
+                for item in grabs:
+                    words = item.split()
+                    if len(words) > 1:
+                        capitalized_item = " ".join([word.capitalize() for word in words])
+                        inventory.append(capitalized_item)
+                    else:
+                        item = item.capitalize()
+                        inventory.append(item)
+                    lower_item = item.lower()
+                    if lower_item in dun_floor[spawn]:
+                        dun_floor[spawn].remove(lower_item)
+        else:
+            print("Inventory is full.")
+
+    if choice == "drop":
         print(inventory)
-        dropped = input("What do you drop? ").capitalize()
+        inventory = [item.lower() for item in inventory]
+        dropped = input("What do you drop? ").lower()
         while dropped not in inventory:
             print("Invalid")
-            dropped = input("What do you drop? ")
-        inventory.remove(dropped)
+            dropped = input("What do you drop? ").lower()
+        dropped = dropped.split()
+        if len(dropped) > 1:
+            dropped = " ".join([word.capitalize() for word in dropped])
+        else:
+            dropped = dropped[0].capitalize()
+        inventory = [item.capitalize() for item in inventory if item != dropped.lower()]
         dun_floor[spawn].append(dropped)
-    if choice == "Fight":
+        if len(dun_floor[spawn]) >= 2:
+            dun_floor[spawn].remove("None")
+    if choice == "fight":
         if "Sword" in inventory or "Big Sword" in inventory or "Cursed Sword" in inventory or "Fire Sword" in inventory or "Thunder Hammer" in inventory:
             print(dun_floor[spawn])
             if "Monster" in dun_floor[spawn]:
@@ -527,13 +561,13 @@ def Turn(dun_floor, spawn, spawn_floor, inventory):
                 dun_floor[spawn].remove(mon)
         else:
             gaming = False
-    if choice == "Boss Fight":
+    if choice == "boss fight":
         gaming = BossBat(inventory, gaming)
         if gaming == False:
             return dun_floor, spawn, spawn_floor, inventory, gaming
         else:
             dun_floor[spawn].remove("Boss")
-    if "PRIZE" in inventory:
+    if "prize" in inventory:
         print("You Win!")
         gaming = False
 
