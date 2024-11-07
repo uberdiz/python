@@ -1,6 +1,6 @@
 import random
 import time
-'''print("Welcome to Zork!")
+print("Welcome to Zork!")
 time.sleep(.6)
 print("You need to collect the Magic Stones to defeat the Boss Monster(Floor 5) and you get the PRIZE the room over!")
 time.sleep(2.5)
@@ -9,7 +9,7 @@ time.sleep(2)
 print("Small hits have small damage potential but are more reliable ex.(5-7)")
 time.sleep(1.5)
 print("Good luck!")
-time.sleep(.8)'''
+time.sleep(.8)
 # 5 Floors with 6 Rooms each
 f1 = [['None'], 
       ['Sword', 'Healing Potion', 'Armor'], 
