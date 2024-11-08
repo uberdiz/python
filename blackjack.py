@@ -62,7 +62,7 @@ def hit(hand):
     hand.append(cards[0])
     del cards[0]
     return hand
-def stand(hand):
+def stand(p_hand, soft, pluh, bet, d_pluh):
     # Dealers Turn
     hand.append(cards[0])
     del cards[0]
@@ -147,9 +147,7 @@ while not done:
         done = True
     elif play == "stand":
         done = True
-        d_hand = stand(d_hand)
-        pluh = list(sum(p_hand))
-        display(p_hand, soft, pluh, bet, d_pluh)
+        done = stand(pluh, bet, d_pluh)
     elif play == "double" and bet * 2 > bank:
         print("You don't have enough money to double your bet.")
     else:
