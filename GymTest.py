@@ -31,6 +31,19 @@ def run_gym_env():
         # First Stage
         initial_state, _ = env.reset()
         discrete_state = get_discrete_state(initial_state)
+        q_table = np.load("0-q_table.npy")
+        update_label("First iterations")
+
+        terminated = truncated = False
+
+        while not (terminated or truncated):
+            action = np.argmax(q_table[discrete_state])
+            state, reward, terminated, truncated, info = env.step(action)
+            discrete_state = get_discrete_state(state)
+
+
+        initial_state, _ = env.reset()
+        discrete_state = get_discrete_state(initial_state)
         q_table = np.load("10000-q_table.npy")
         update_label("First 10,000 iterations")
 
@@ -57,7 +70,7 @@ def run_gym_env():
         # Third Stage
         initial_state, _ = env.reset()
         discrete_state = get_discrete_state(initial_state)
-        q_table = np.load("32000-q_table.npy")
+        q_table = np.load("40000-q_table.npy")
         update_label("Final model!")
 
         terminated = truncated = False
