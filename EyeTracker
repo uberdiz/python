@@ -1,0 +1,77 @@
+import sys
+import cv2
+from eyetrax import GazeEstimator, run_9_point_calibration
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QPainter, QColor, QBrush
+
+class TransparentOverlay(QWidget):
+    def __init__(self, estimator):
+        super().__init__()
+        # Window setup: frameless, always on top, not in taskbar
+        flags = Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool
+        self.setWindowFlags(flags)
+        # Enable transparent background and click-through
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        # Fullscreen overlay
+        self.showFullScreen()
+
+        self.estimator = estimator
+        self.cap = cv2.VideoCapture(0)
+        self.circle_radius = 30
+        # Semi-transparent red
+        self.color = QColor(255, 0, 0, int(0.4 * 255))
+        self.gaze_point = None
+
+        # Timer to update gaze
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_gaze)
+        self.timer.start(30)  # ~33 FPS
+
+    def update_gaze(self):
+        ret, frame = self.cap.read()
+        if not ret:
+            return
+        features, blink = self.estimator.extract_features(frame)
+        if features is not None and not blink:
+            x, y = self.estimator.predict([features])[0]
+            # Bound within screen
+            screen_w = self.width()
+            screen_h = self.height()
+            ix = max(0, min(int(x), screen_w - 1))
+            iy = max(0, min(int(y), screen_h - 1))
+            self.gaze_point = (ix, iy)
+        else:
+            self.gaze_point = None
+        self.update()
+
+    def paintEvent(self, event):
+        if self.gaze_point:
+            painter = QPainter(self)
+            painter.setRenderHint(QPainter.Antialiasing)
+            painter.setBrush(QBrush(self.color))
+            painter.setPen(Qt.NoPen)
+            ix, iy = self.gaze_point
+            painter.drawEllipse(ix - self.circle_radius,
+                                iy - self.circle_radius,
+                                self.circle_radius * 2,
+                                self.circle_radius * 2)
+
+    def closeEvent(self, event):
+        self.cap.release()
+        super().closeEvent(event)
+
+if __name__ == '__main__':
+    # Calibration and model setup
+    estimator = GazeEstimator()
+    run_9_point_calibration(estimator)
+    estimator.save_model("gaze_model.pkl")
+
+    estimator = GazeEstimator()
+    estimator.load_model("gaze_model.pkl")
+
+    # Launch overlay
+    app = QApplication(sys.argv)
+    overlay = TransparentOverlay(estimator)
+    sys.exit(app.exec_())
