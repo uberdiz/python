@@ -47,7 +47,34 @@ def cosLaw(a, b, c, C):
         C = m.degrees(m.acos((a**2 + b**2 - c**2) / (2 * a * b))) 
     return a, b, c, C
 
-def FindWhole(): # |_\ a, b, c |_ = A, _\ = B, |\ = C
-    
-
-print(cosLaw(19, 24, 28, None))
+def FindWhole(a, b, c, A, B, C):
+    if A == 90:
+        if not c and a and b:
+            c = round(m.sqrt(a**2 + b**2), 5)
+        if not a and c and b:
+            a = round(m.sqrt(c**2 - b**2), 5)
+        if not b and c and a:
+            b = round(m.sqrt(c**2 - a**2), 5)
+        if not A and a and b:
+            A = 90
+        if A == 90:
+            if not B and a and c:
+                B = round(m.degrees(m.asin(a / c)), 5)
+            if not B and b and c:
+                B = round(m.degrees(m.acos(b / c)), 5)
+            if not C and A and B:
+                C = 90 - B
+    else:
+        if a and b and C and not c:
+            c = round(m.sqrt(a**2 + b**2 - 2 * a * b * m.cos(m.radians(C))), 5)
+        if a and c and B and not b:
+            b = round(m.sqrt(a**2 + c**2 - 2 * a * c * m.cos(m.radians(B))), 5)
+        if b and c and A and not a:
+            a = round(m.sqrt(b**2 + c**2 - 2 * b * c * m.cos(m.radians(A))), 5)
+        if a and b and c and not A:
+            A = round(m.degrees(m.acos((b**2 + c**2 - a**2) / (2 * b * c))), 5)
+        if a and b and c and not B:
+            B = round(m.degrees(m.acos((a**2 + c**2 - b**2) / (2 * a * c))), 5)
+        if a and b and c and not C:
+            C = round(m.degrees(m.acos((a**2 + b**2 - c**2) / (2 * a * b))), 5)
+    return a, b, c, A, B, C
