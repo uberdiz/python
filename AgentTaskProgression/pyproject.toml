@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-dev-ide"
+version = "1.0.0"
+description = "A visionary AI-powered Integrated Development Environment"
+requires-python = ">=3.10"
+dependencies = [
+    "pygments>=2.16.1",
+    "SpeechRecognition>=3.10.0",
+    "sounddevice>=0.4.6",
+    "numpy>=1.26.0",
+    "pillow==10.1.0",
+    "requests==2.31.0",
+    "huggingface-hub>=0.20.0",
+    "pynput>=1.7.6",
+    "tkterminal"
+]
+
+[project.scripts]
+ai-dev-ide = "launcher:main_launcher"
